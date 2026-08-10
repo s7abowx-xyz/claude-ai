@@ -4,34 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Claude AI - Rin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'Noto Sans Arabic', 'sans-serif'],
-                    },
-                    colors: {
-                        claude: {
-                            orange: '#d97757',
-                            dark: '#0d0d0d',
-                            sidebar: '#1a1a1a',
-                            border: '#2a2a2a',
-                            hover: '#2a2a2a',
-                            text: '#e8e8e8',
-                            muted: '#888',
-                            code: '#0f0f0f',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', 'Noto Sans Arabic', sans-serif; background: #0d0d0d; color: #e8e8e8; overflow: hidden; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans Arabic', sans-serif; 
+            background: #0d0d0d; 
+            color: #e8e8e8; 
+            overflow: hidden;
+            height: 100vh;
+        }
 
         /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -50,19 +31,7 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
         }
-        .typing-cursor { animation: blink 1s infinite; color: #d97757; }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .animate-pulse-slow { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        .animate-slide-in { animation: slideIn 0.3s ease-out forwards; }
+        .typing-cursor { animation: blink 1s infinite; color: #d97757; font-weight: bold; }
 
         @keyframes glow {
             0%, 100% { box-shadow: 0 0 5px rgba(217, 119, 87, 0.3); }
@@ -70,274 +39,472 @@
         }
         .glow-effect { animation: glow 2s ease-in-out infinite; }
 
-        /* Code block styling */
-        .code-block { background: #0f0f0f; border-radius: 12px; overflow: hidden; border: 1px solid #2a2a2a; }
-        .code-header { background: #1a1a1a; padding: 10px 16px; border-bottom: 1px solid #2a2a2a; display: flex; justify-content: space-between; align-items: center; }
-        .code-content { padding: 16px; overflow-x: auto; font-family: 'Fira Code', 'Consolas', monospace; font-size: 13px; line-height: 1.6; }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
 
-        /* Syntax highlighting */
-        .token-keyword { color: #c586c0; }
-        .token-function { color: #dcdcaa; }
-        .token-string { color: #ce9178; }
-        .token-comment { color: #6a9955; }
-        .token-number { color: #b5cea8; }
-        .token-operator { color: #d4d4d4; }
-        .token-variable { color: #9cdcfe; }
-        .token-class { color: #4ec9b0; }
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
 
-        /* Sidebar */
-        .sidebar { width: 260px; background: #1a1a1a; border-left: 1px solid #2a2a2a; display: flex; flex-direction: column; transition: transform 0.3s ease; }
-        .sidebar-hidden { transform: translateX(100%); }
-
-        /* Chat item */
-        .chat-item { padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 13px; color: #ccc; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .chat-item:hover { background: #2a2a2a; }
-        .chat-item.active { background: #2a2a2a; color: white; }
-
-        /* Input */
-        .input-container { background: #1a1a1a; border: 1px solid #333; border-radius: 16px; transition: border-color 0.2s; }
-        .input-container:focus-within { border-color: #d97757; }
-
-        /* Message bubble */
-        .user-bubble { background: #2a2a2a; border-radius: 16px; border-top-left-radius: 4px; padding: 12px 16px; max-width: 80%; }
-        .ai-bubble { flex: 1; }
-
-        /* Button hover effects */
-        .icon-btn { padding: 6px; border-radius: 6px; transition: all 0.2s; color: #666; }
-        .icon-btn:hover { background: #2a2a2a; color: white; }
-
-        /* Loading dots */
-        .loading-dots { display: flex; gap: 4px; }
-        .loading-dots span { width: 6px; height: 6px; background: #d97757; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
-        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
         @keyframes bounce {
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1); }
         }
+        .loading-dots span { 
+            width: 6px; height: 6px; background: #d97757; border-radius: 50%; 
+            display: inline-block; animation: bounce 1.4s infinite ease-in-out both; margin: 0 2px;
+        }
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
 
-        /* Toast notification */
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: #2a2a2a; color: white; padding: 10px 20px; border-radius: 8px; font-size: 13px; opacity: 0; transition: all 0.3s; z-index: 1000; border: 1px solid #333; }
-        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        /* Layout */
+        .app { display: flex; height: 100vh; width: 100%; }
 
-        /* Model selector dropdown */
-        .dropdown { position: relative; }
-        .dropdown-menu { position: absolute; top: 100%; right: 0; margin-top: 8px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 8px; min-width: 200px; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; z-index: 50; }
-        .dropdown.open .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
-        .dropdown-item { padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 13px; }
-        .dropdown-item:hover { background: #2a2a2a; }
-        .dropdown-item .check { color: #d97757; }
-
-        /* Mobile responsive */
+        /* Sidebar */
+        .sidebar { 
+            width: 260px; background: #1a1a1a; border-left: 1px solid #2a2a2a; 
+            display: flex; flex-direction: column; transition: transform 0.3s ease;
+            position: relative; z-index: 100;
+        }
+        .sidebar.hidden { transform: translateX(100%); }
         @media (max-width: 768px) {
-            .sidebar { position: absolute; right: 0; top: 0; height: 100%; z-index: 50; }
-            .sidebar-hidden { transform: translateX(100%); }
+            .sidebar { position: absolute; right: 0; top: 0; height: 100%; }
+            .sidebar.hidden { transform: translateX(100%); }
         }
 
-        /* Selection color */
+        .sidebar-header { padding: 12px; display: flex; align-items: center; justify-content: space-between; }
+        .new-chat-btn { 
+            display: flex; align-items: center; gap: 8px; padding: 8px 12px; 
+            border-radius: 8px; background: transparent; border: none; color: #e0e0e0;
+            cursor: pointer; font-size: 13px; font-weight: 500; transition: background 0.2s;
+        }
+        .new-chat-btn:hover { background: #2a2a2a; }
+
+        .icon-btn { 
+            padding: 8px; border-radius: 8px; background: transparent; border: none;
+            color: #888; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+        }
+        .icon-btn:hover { background: #2a2a2a; color: white; }
+        .icon-btn.active { color: #d97757; }
+
+        .search-box { padding: 0 12px 8px; }
+        .search-box input { 
+            width: 100%; background: #252525; border: 1px solid #333; border-radius: 8px;
+            padding: 8px 12px 8px 32px; color: white; font-size: 13px; outline: none;
+        }
+        .search-box input:focus { border-color: #d97757; }
+        .search-box input::placeholder { color: #666; }
+
+        .chat-list { flex: 1; overflow-y: auto; padding: 0 8px; }
+        .chat-section-title { 
+            font-size: 11px; color: #666; padding: 8px 12px; font-weight: 600; 
+        }
+        .chat-item { 
+            padding: 8px 12px; border-radius: 8px; cursor: pointer; 
+            font-size: 13px; color: #ccc; text-align: right;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            background: transparent; border: none; width: 100%; display: block;
+            transition: background 0.2s; margin-bottom: 2px;
+        }
+        .chat-item:hover { background: #2a2a2a; }
+        .chat-item.active { background: #2a2a2a; color: white; }
+
+        .sidebar-footer { padding: 12px; border-top: 1px solid #2a2a2a; }
+        .profile-btn { 
+            display: flex; align-items: center; gap: 12px; padding: 8px 12px;
+            border-radius: 8px; background: transparent; border: none; color: white;
+            cursor: pointer; width: 100%; transition: background 0.2s;
+        }
+        .profile-btn:hover { background: #2a2a2a; }
+        .profile-avatar { 
+            width: 32px; height: 32px; border-radius: 50%; 
+            background: linear-gradient(135deg, #d97757, #c45a3a);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: bold; flex-shrink: 0;
+        }
+        .profile-info { flex: 1; text-align: right; }
+        .profile-name { font-size: 13px; color: white; }
+        .profile-phone { font-size: 11px; color: #888; }
+
+        /* Main Content */
+        .main { flex: 1; display: flex; flex-direction: column; position: relative; background: #0d0d0d; }
+
+        /* Header */
+        .header { 
+            height: 48px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px; border-bottom: 1px solid #2a2a2a; flex-shrink: 0;
+        }
+        .header-left { display: flex; align-items: center; gap: 8px; }
+        .header-right { display: flex; align-items: center; gap: 4px; }
+
+        .model-selector { 
+            display: flex; align-items: center; gap: 4px; padding: 4px 8px;
+            border-radius: 6px; cursor: pointer; color: #888; font-size: 13px;
+            background: transparent; border: none; transition: color 0.2s;
+        }
+        .model-selector:hover { color: white; }
+
+        /* Dropdown */
+        .dropdown { position: relative; }
+        .dropdown-menu { 
+            position: absolute; top: calc(100% + 8px); right: 0;
+            background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px;
+            padding: 8px; min-width: 220px; opacity: 0; visibility: hidden;
+            transform: translateY(-10px); transition: all 0.2s; z-index: 200;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .dropdown.open .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown-item { 
+            padding: 10px 12px; border-radius: 8px; cursor: pointer;
+            font-size: 13px; display: flex; align-items: center; justify-content: space-between;
+            transition: background 0.2s;
+        }
+        .dropdown-item:hover { background: #2a2a2a; }
+        .dropdown-item-title { color: white; font-size: 13px; }
+        .dropdown-item-desc { color: #666; font-size: 11px; margin-top: 2px; }
+        .dropdown-item-check { color: #d97757; }
+        .dropdown-divider { border-top: 1px solid #2a2a2a; margin: 4px 0; }
+
+        /* Chat Area */
+        .chat-area { flex: 1; overflow-y: auto; padding: 24px 16px; }
+
+        /* Welcome Screen */
+        .welcome { 
+            display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; min-height: 100%; text-align: center;
+        }
+        .welcome-logo { 
+            width: 64px; height: 64px; border-radius: 16px;
+            background: linear-gradient(135deg, #d97757, #c45a3a);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 24px; glow-effect;
+        }
+        .welcome-title { font-size: 28px; font-weight: 600; color: white; margin-bottom: 12px; }
+        .welcome-subtitle { font-size: 14px; color: #888; max-width: 400px; margin-bottom: 32px; }
+
+        .quick-cards { 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+            max-width: 480px; width: 100%; padding: 0 16px;
+        }
+        @media (max-width: 480px) {
+            .quick-cards { grid-template-columns: 1fr; }
+        }
+        .quick-card { 
+            padding: 16px; border-radius: 12px; background: #1a1a1a;
+            border: 1px solid #2a2a2a; cursor: pointer; text-align: right;
+            transition: all 0.2s;
+        }
+        .quick-card:hover { border-color: rgba(217, 119, 87, 0.5); background: #222; }
+        .quick-card-icon { color: #d97757; margin-bottom: 8px; }
+        .quick-card-title { font-size: 14px; color: white; margin-bottom: 4px; }
+        .quick-card-desc { font-size: 12px; color: #666; }
+
+        /* Messages */
+        .messages { max-width: 768px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 24px; }
+        .message { display: flex; gap: 16px; }
+        .message-user { justify-content: flex-end; }
+        .message-user .message-content { max-width: 80%; }
+        .message-user-bubble { 
+            background: #2a2a2a; border-radius: 16px; border-top-left-radius: 4px;
+            padding: 12px 16px; color: #e8e8e8; font-size: 14px; line-height: 1.6;
+        }
+        .message-time { font-size: 10px; color: #555; margin-top: 4px; text-align: left; }
+        .message-avatar { 
+            width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: bold;
+        }
+        .message-avatar-user { 
+            background: linear-gradient(135deg, #d97757, #c45a3a); color: white;
+        }
+        .message-avatar-ai { 
+            background: #d97757; border-radius: 6px;
+        }
+        .message-ai-content { flex: 1; }
+        .message-ai-text { 
+            font-size: 14px; color: #e8e8e8; line-height: 1.7;
+        }
+        .message-ai-text p { margin-bottom: 12px; }
+        .message-ai-text strong { color: white; }
+        .message-ai-text code { 
+            background: #2a2a2a; padding: 2px 6px; border-radius: 4px;
+            color: #d97757; font-size: 12px; font-family: monospace;
+        }
+        .message-actions { 
+            display: flex; gap: 4px; margin-top: 8px;
+        }
+
+        /* Code Block */
+        .code-block { 
+            background: #0f0f0f; border-radius: 12px; overflow: hidden;
+            border: 1px solid #2a2a2a; margin: 12px 0;
+        }
+        .code-header { 
+            background: #1a1a1a; padding: 10px 16px; border-bottom: 1px solid #2a2a2a;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .code-lang { font-size: 12px; color: #888; }
+        .code-copy { 
+            font-size: 12px; color: #888; background: transparent; border: none;
+            cursor: pointer; display: flex; align-items: center; gap: 4px;
+        }
+        .code-copy:hover { color: white; }
+        .code-content { 
+            padding: 16px; overflow-x: auto; font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px; line-height: 1.6; color: #e8e8e8;
+        }
+        .code-keyword { color: #c586c0; }
+        .code-function { color: #dcdcaa; }
+        .code-string { color: #ce9178; }
+        .code-variable { color: #9cdcfe; }
+        .code-class { color: #4ec9b0; }
+        .code-comment { color: #6a9955; }
+        .code-number { color: #b5cea8; }
+
+        /* Input Area */
+        .input-area { padding: 8px 16px 16px; flex-shrink: 0; }
+        .input-container { max-width: 768px; margin: 0 auto; }
+        .input-box { 
+            background: #1a1a1a; border: 1px solid #333; border-radius: 16px;
+            transition: border-color 0.2s;
+        }
+        .input-box:focus-within { border-color: #d97757; }
+        .input-attachments { 
+            display: none; padding: 12px 16px 4px; gap: 8px; flex-wrap: wrap;
+        }
+        .input-attachments.show { display: flex; }
+        .attachment-tag { 
+            display: flex; align-items: center; gap: 8px; background: #2a2a2a;
+            padding: 6px 12px; border-radius: 8px; font-size: 12px; color: #ccc;
+        }
+        .attachment-tag button { 
+            background: transparent; border: none; color: #888; cursor: pointer;
+            display: flex; align-items: center;
+        }
+        .attachment-tag button:hover { color: white; }
+
+        .input-textarea { 
+            width: 100%; background: transparent; border: none; color: white;
+            font-size: 14px; padding: 12px 16px; outline: none; resize: none;
+            max-height: 200px; font-family: inherit;
+        }
+        .input-textarea::placeholder { color: #666; }
+
+        .input-toolbar { 
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 12px 12px;
+        }
+        .input-toolbar-left { display: flex; gap: 4px; }
+        .input-send { 
+            padding: 8px; border-radius: 8px; background: #d97757; border: none;
+            color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .input-send:hover { background: #c45a3a; }
+        .input-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .input-footer { text-align: center; margin-top: 8px; }
+        .input-footer-text { font-size: 10px; color: #555; }
+
+        /* Toast */
+        .toast { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: #2a2a2a; color: white; padding: 10px 20px; border-radius: 8px;
+            font-size: 13px; opacity: 0; transition: all 0.3s; z-index: 1000;
+            border: 1px solid #333; pointer-events: none;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* Overlay for mobile sidebar */
+        .overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 50;
+        }
+        .overlay.show { opacity: 1; visibility: visible; }
+
+        /* Selection */
         ::selection { background: rgba(217, 119, 87, 0.3); color: white; }
     </style>
 </head>
 <body>
-    <div class="flex h-screen w-full">
+    <div class="app" id="app">
         <!-- Sidebar -->
-        <aside id="sidebar" class="sidebar">
-            <!-- Header -->
-            <div class="p-3 flex items-center justify-between">
-                <button onclick="newChat()" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#2a2a2a] transition-colors text-sm font-medium text-[#e0e0e0]">
+        <aside class="sidebar hidden" id="sidebar">
+            <div class="sidebar-header">
+                <button class="new-chat-btn" onclick="newChat()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
                     محادثة جديدة
                 </button>
-                <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-[#2a2a2a] transition-colors text-[#888] lg:hidden">
+                <button class="icon-btn" onclick="toggleSidebar()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
 
-            <!-- Search -->
-            <div class="px-3 pb-2">
-                <div class="relative">
-                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 text-[#666]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                    <input type="text" id="search-input" placeholder="بحث في المحادثات..." class="w-full bg-[#252525] text-sm text-white placeholder-[#666] rounded-lg pr-9 pl-3 py-2 outline-none focus:ring-1 focus:ring-[#d97757] border border-[#333]" oninput="searchChats(this.value)">
-                </div>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="بحث في المحادثات..." oninput="searchChats(this.value)">
             </div>
 
-            <!-- Chat History -->
-            <div class="flex-1 overflow-y-auto px-2 py-2 space-y-1" id="chat-list">
-                <div class="text-xs text-[#666] px-3 py-2 font-medium">اليوم</div>
-                <button onclick="loadChat(0)" class="w-full chat-item active">موقع AI مثل Claude</button>
-                <button onclick="loadChat(1)" class="w-full chat-item">شرح React Hooks</button>
-                <button onclick="loadChat(2)" class="w-full chat-item">كتابة كود Python</button>
+            <div class="chat-list" id="chat-list">
+                <div class="chat-section-title">اليوم</div>
+                <button class="chat-item active" onclick="loadChat(0)">موقع AI مثل Claude</button>
+                <button class="chat-item" onclick="loadChat(1)">شرح React Hooks</button>
+                <button class="chat-item" onclick="loadChat(2)">كتابة كود Python</button>
 
-                <div class="text-xs text-[#666] px-3 py-2 font-medium mt-3">الأمس</div>
-                <button onclick="loadChat(3)" class="w-full chat-item">تصميم موقع إلكتروني</button>
-                <button onclick="loadChat(4)" class="w-full chat-item">تحليل بيانات</button>
+                <div class="chat-section-title">الأمس</div>
+                <button class="chat-item" onclick="loadChat(3)">تصميم موقع إلكتروني</button>
+                <button class="chat-item" onclick="loadChat(4)">تحليل بيانات</button>
 
-                <div class="text-xs text-[#666] px-3 py-2 font-medium mt-3">الأسبوع الماضي</div>
-                <button onclick="loadChat(5)" class="w-full chat-item">تعلم JavaScript</button>
-                <button onclick="loadChat(6)" class="w-full chat-item">مشروع Flutter</button>
-                <button onclick="loadChat(7)" class="w-full chat-item">خطة تسويقية</button>
-                <button onclick="loadChat(8)" class="w-full chat-item">ترجمة مقال</button>
+                <div class="chat-section-title">الأسبوع الماضي</div>
+                <button class="chat-item" onclick="loadChat(5)">تعلم JavaScript</button>
+                <button class="chat-item" onclick="loadChat(6)">مشروع Flutter</button>
+                <button class="chat-item" onclick="loadChat(7)">خطة تسويقية</button>
+                <button class="chat-item" onclick="loadChat(8)">ترجمة مقال</button>
             </div>
 
-            <!-- Footer -->
-            <div class="p-3 border-t border-[#2a2a2a]">
-                <button onclick="toggleProfileMenu()" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#2a2a2a] transition-colors relative">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#d97757] to-[#c45a3a] flex items-center justify-center text-xs font-bold text-white">ر</div>
-                    <div class="flex-1 text-right">
-                        <div class="text-sm text-white">Rin</div>
-                        <div class="text-xs text-[#888]">+20 101 727 4961</div>
+            <div class="sidebar-footer">
+                <button class="profile-btn" onclick="toggleProfileMenu()">
+                    <div class="profile-avatar">ر</div>
+                    <div class="profile-info">
+                        <div class="profile-name">Rin</div>
+                        <div class="profile-phone">+20 101 727 4961</div>
                     </div>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[#666]"><path d="M15 18l-6-6 6-6"/></svg>
-
-                    <!-- Profile Dropdown -->
-                    <div id="profile-menu" class="dropdown-menu" style="bottom: 100%; top: auto; right: 0; margin-top: 0; margin-bottom: 8px;">
-                        <div class="dropdown-item flex items-center gap-2">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            الملف الشخصي
-                        </div>
-                        <div class="dropdown-item flex items-center gap-2">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                            الإعدادات
-                        </div>
-                        <div class="dropdown-item flex items-center gap-2">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                            الاشتراك
-                        </div>
-                        <div class="border-t border-[#2a2a2a] my-1"></div>
-                        <div class="dropdown-item flex items-center gap-2 text-red-400">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                            تسجيل الخروج
-                        </div>
-                    </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#666"><path d="M15 18l-6-6 6-6"/></svg>
                 </button>
             </div>
         </aside>
 
+        <!-- Overlay -->
+        <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
         <!-- Main Content -->
-        <main class="flex-1 flex flex-col relative bg-[#0d0d0d]">
-            <!-- Top Bar -->
-            <header class="h-12 flex items-center justify-between px-4 border-b border-[#2a2a2a]">
-                <div class="flex items-center gap-2">
-                    <button onclick="toggleSidebar()" class="p-1.5 rounded-lg hover:bg-[#2a2a2a] transition-colors text-[#888] lg:hidden">
+        <main class="main">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="icon-btn" onclick="toggleSidebar()">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
                     </button>
                     <div class="dropdown" id="model-dropdown">
-                        <button onclick="toggleModelDropdown()" class="flex items-center gap-2 text-sm text-[#888] hover:text-white transition-colors">
+                        <button class="model-selector" onclick="toggleModelDropdown()">
                             <span id="current-model">Claude 4 Sonnet</span>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
                         </button>
                         <div class="dropdown-menu">
-                            <div class="dropdown-item flex items-center justify-between" onclick="selectModel('Claude 4 Sonnet')">
+                            <div class="dropdown-item" onclick="selectModel('Claude 4 Sonnet')">
                                 <div>
-                                    <div class="text-white text-sm">Claude 4 Sonnet</div>
-                                    <div class="text-[#666] text-xs">الأفضل للمهام اليومية</div>
+                                    <div class="dropdown-item-title">Claude 4 Sonnet</div>
+                                    <div class="dropdown-item-desc">الأفضل للمهام اليومية</div>
                                 </div>
-                                <svg class="check hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                <svg class="dropdown-item-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
                             </div>
-                            <div class="dropdown-item flex items-center justify-between" onclick="selectModel('Claude 4 Opus')">
+                            <div class="dropdown-item" onclick="selectModel('Claude 4 Opus')">
                                 <div>
-                                    <div class="text-white text-sm">Claude 4 Opus</div>
-                                    <div class="text-[#666] text-xs">الأقوى للمهام المعقدة</div>
+                                    <div class="dropdown-item-title">Claude 4 Opus</div>
+                                    <div class="dropdown-item-desc">الأقوى للمهام المعقدة</div>
                                 </div>
-                                <svg class="check hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                <svg class="dropdown-item-check hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
                             </div>
-                            <div class="dropdown-item flex items-center justify-between" onclick="selectModel('Claude 4 Haiku')">
+                            <div class="dropdown-item" onclick="selectModel('Claude 4 Haiku')">
                                 <div>
-                                    <div class="text-white text-sm">Claude 4 Haiku</div>
-                                    <div class="text-[#666] text-xs">الأسرع للردود القصيرة</div>
+                                    <div class="dropdown-item-title">Claude 4 Haiku</div>
+                                    <div class="dropdown-item-desc">الأسرع للردود القصيرة</div>
                                 </div>
-                                <svg class="check hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                <svg class="dropdown-item-check hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-1">
-                    <button onclick="shareChat()" class="icon-btn" title="مشاركة">
+                <div class="header-right">
+                    <button class="icon-btn" onclick="shareChat()" title="مشاركة">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                    </button>
-                    <button onclick="toggleSettings()" class="icon-btn" title="الإعدادات">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
                     </button>
                 </div>
             </header>
 
             <!-- Chat Area -->
-            <div id="chat-area" class="flex-1 overflow-y-auto px-4 py-6">
+            <div class="chat-area" id="chat-area">
                 <!-- Welcome Screen -->
-                <div id="welcome-screen" class="flex flex-col items-center justify-center h-full text-center">
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#d97757] to-[#c45a3a] flex items-center justify-center mb-6 shadow-lg shadow-[#d97757]/20 glow-effect">
+                <div class="welcome" id="welcome-screen">
+                    <div class="welcome-logo glow-effect">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                     </div>
-                    <h1 class="text-3xl font-semibold mb-3 text-white">كيف أقدر أساعدك اليوم؟</h1>
-                    <p class="text-[#888] text-sm max-w-md mb-8">Claude 4 Sonnet - نموذج ذكاء اصطناعي متقدم يساعدك في البرمجة، الكتابة، التحليل، والمزيد</p>
+                    <h1 class="welcome-title">كيف أقدر أساعدك اليوم؟</h1>
+                    <p class="welcome-subtitle">Claude 4 Sonnet - نموذج ذكاء اصطناعي متقدم يساعدك في البرمجة، الكتابة، التحليل، والمزيد</p>
 
-                    <div class="grid grid-cols-2 gap-3 max-w-lg w-full">
-                        <button onclick="sendQuick('اكتب لي كود React component')" class="p-4 rounded-xl bg-[#1a1a1a] border border-[#2a2a2a] hover:border-[#d97757]/50 hover:bg-[#222] transition-all text-right group">
-                            <div class="text-[#d97757] mb-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-                            <div class="text-sm text-white">اكتب كود برمجي</div>
-                            <div class="text-xs text-[#666] mt-1">React, Python, Flutter...</div>
-                        </button>
-                        <button onclick="sendQuick('حلل لي هذا النص')" class="p-4 rounded-xl bg-[#1a1a1a] border border-[#2a2a2a] hover:border-[#d97757]/50 hover:bg-[#222] transition-all text-right group">
-                            <div class="text-[#d97757] mb-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-                            <div class="text-sm text-white">حلل نص أو مستند</div>
-                            <div class="text-xs text-[#666] mt-1">تلخيص، ترجمة، مراجعة</div>
-                        </button>
-                        <button onclick="sendQuick('ساعدني في حل مسألة رياضية')" class="p-4 rounded-xl bg-[#1a1a1a] border border-[#2a2a2a] hover:border-[#d97757]/50 hover:bg-[#222] transition-all text-right group">
-                            <div class="text-[#d97757] mb-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
-                            <div class="text-sm text-white">شرح دراسي</div>
-                            <div class="text-xs text-[#666] mt-1">رياضيات، فيزياء، كيمياء</div>
-                        </button>
-                        <button onclick="sendQuick('صمم لي خطة تسويقية')" class="p-4 rounded-xl bg-[#1a1a1a] border border-[#2a2a2a] hover:border-[#d97757]/50 hover:bg-[#222] transition-all text-right group">
-                            <div class="text-[#d97757] mb-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-                            <div class="text-sm text-white">كتابة محتوى</div>
-                            <div class="text-xs text-[#666] mt-1">تسويق، مدونات، إعلانات</div>
-                        </button>
+                    <div class="quick-cards">
+                        <div class="quick-card" onclick="sendQuick('اكتب لي كود React component')">
+                            <div class="quick-card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                            </div>
+                            <div class="quick-card-title">اكتب كود برمجي</div>
+                            <div class="quick-card-desc">React, Python, Flutter...</div>
+                        </div>
+                        <div class="quick-card" onclick="sendQuick('حلل لي هذا النص')">
+                            <div class="quick-card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            </div>
+                            <div class="quick-card-title">حلل نص أو مستند</div>
+                            <div class="quick-card-desc">تلخيص، ترجمة، مراجعة</div>
+                        </div>
+                        <div class="quick-card" onclick="sendQuick('ساعدني في حل مسألة رياضية')">
+                            <div class="quick-card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+                            </div>
+                            <div class="quick-card-title">شرح دراسي</div>
+                            <div class="quick-card-desc">رياضيات، فيزياء، كيمياء</div>
+                        </div>
+                        <div class="quick-card" onclick="sendQuick('صمم لي خطة تسويقية')">
+                            <div class="quick-card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                            </div>
+                            <div class="quick-card-title">كتابة محتوى</div>
+                            <div class="quick-card-desc">تسويق، مدونات، إعلانات</div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Messages Container -->
-                <div id="messages-container" class="max-w-3xl mx-auto w-full space-y-6 hidden">
-                    <!-- Demo Messages will be inserted here -->
-                </div>
+                <div class="messages" id="messages-container" style="display:none"></div>
             </div>
 
             <!-- Input Area -->
-            <div class="px-4 pb-4 pt-2">
-                <div class="max-w-3xl mx-auto">
-                    <div class="input-container">
-                        <!-- Attachments Preview -->
-                        <div id="attachments" class="hidden px-4 pt-3 pb-1 flex gap-2 flex-wrap">
-                            <div class="flex items-center gap-2 bg-[#2a2a2a] rounded-lg px-3 py-1.5 text-xs text-[#ccc]">
+            <div class="input-area">
+                <div class="input-container">
+                    <div class="input-box">
+                        <div class="input-attachments" id="attachments">
+                            <div class="attachment-tag">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
                                 document.pdf
-                                <button onclick="removeAttachment()" class="hover:text-white"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                                <button onclick="removeAttachment()">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                </button>
                             </div>
                         </div>
 
-                        <textarea id="message-input" rows="1" placeholder="اكتب رسالتك هنا..." 
-                            class="w-full bg-transparent text-white text-sm px-4 py-3 outline-none resize-none placeholder-[#666] max-h-[200px]"
-                            oninput="autoResize(this)"
-                            onkeydown="handleKeydown(event)"></textarea>
+                        <textarea id="message-input" class="input-textarea" rows="1" placeholder="اكتب رسالتك هنا..." oninput="autoResize(this)" onkeydown="handleKeydown(event)"></textarea>
 
-                        <div class="flex items-center justify-between px-3 pb-3">
-                            <div class="flex items-center gap-1">
-                                <button onclick="toggleAttachment()" class="p-2 rounded-lg hover:bg-[#2a2a2a] transition-colors text-[#888] hover:text-white" title="إرفاق ملف">
+                        <div class="input-toolbar">
+                            <div class="input-toolbar-left">
+                                <button class="icon-btn" onclick="toggleAttachment()" title="إرفاق ملف">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
                                 </button>
-                                <button onclick="toggleWebSearch()" id="web-search-btn" class="p-2 rounded-lg hover:bg-[#2a2a2a] transition-colors text-[#888] hover:text-white" title="البحث في الويب">
+                                <button class="icon-btn" id="web-search-btn" onclick="toggleWebSearch()" title="البحث في الويب">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                                 </button>
-                                <button onclick="toggleThinkMode()" id="think-btn" class="p-2 rounded-lg hover:bg-[#2a2a2a] transition-colors text-[#888] hover:text-white" title="وضع التفكير العميق">
+                                <button class="icon-btn" id="think-btn" onclick="toggleThinkMode()" title="وضع التفكير العميق">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                                 </button>
                             </div>
-                            <button onclick="sendMessage()" id="send-btn" class="p-2 rounded-lg bg-[#d97757] hover:bg-[#c45a3a] transition-colors text-white disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+                            <button class="input-send" id="send-btn" onclick="sendMessage()" disabled>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                             </button>
                         </div>
                     </div>
-                    <div class="text-center mt-2">
-                        <span class="text-[10px] text-[#555]">Claude قد ينتج معلومات غير دقيقة. تحقق من المعلومات المهمة.</span>
+                    <div class="input-footer">
+                        <span class="input-footer-text">Claude قد ينتج معلومات غير دقيقة. تحقق من المعلومات المهمة.</span>
                     </div>
                 </div>
             </div>
@@ -345,78 +512,123 @@
     </div>
 
     <!-- Toast -->
-    <div id="toast" class="toast"></div>
-
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-        <div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl w-full max-w-md mx-4 p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg font-semibold text-white">الإعدادات</h2>
-                <button onclick="toggleSettings()" class="p-1 rounded-lg hover:bg-[#2a2a2a] text-[#666]">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-            </div>
-            <div class="space-y-4">
-                <div class="flex items-center justify-between py-3 border-b border-[#2a2a2a]">
-                    <div>
-                        <div class="text-sm text-white">الوضع الداكن</div>
-                        <div class="text-xs text-[#666]">تفعيل/إلغاء الوضع الداكن</div>
-                    </div>
-                    <button class="w-12 h-6 bg-[#d97757] rounded-full relative transition-colors" onclick="toggleDarkMode(this)">
-                        <span class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full transition-transform"></span>
-                    </button>
-                </div>
-                <div class="flex items-center justify-between py-3 border-b border-[#2a2a2a]">
-                    <div>
-                        <div class="text-sm text-white">تأثيرات الكتابة</div>
-                        <div class="text-xs text-[#666]">عرض الردود بتأثير الكتابة الحية</div>
-                    </div>
-                    <button class="w-12 h-6 bg-[#d97757] rounded-full relative transition-colors" onclick="toggleTypingEffect(this)">
-                        <span class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full transition-transform"></span>
-                    </button>
-                </div>
-                <div class="flex items-center justify-between py-3">
-                    <div>
-                        <div class="text-sm text-white">اللغة</div>
-                        <div class="text-xs text-[#666]">لغة واجهة المستخدم</div>
-                    </div>
-                    <select class="bg-[#252525] border border-[#333] rounded-lg px-3 py-1.5 text-sm text-white outline-none">
-                        <option>العربية</option>
-                        <option>English</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="toast" id="toast"></div>
 
     <script>
-        // State
+        // ===== STATE =====
         let currentModel = 'Claude 4 Sonnet';
         let typingEnabled = true;
         let webSearchEnabled = false;
         let thinkModeEnabled = false;
-        let chats = [
-            { id: 0, title: 'موقع AI مثل Claude', date: 'today', messages: [] },
-            { id: 1, title: 'شرح React Hooks', date: 'today', messages: [] },
-            { id: 2, title: 'كتابة كود Python', date: 'today', messages: [] },
-            { id: 3, title: 'تصميم موقع إلكتروني', date: 'yesterday', messages: [] },
-            { id: 4, title: 'تحليل بيانات', date: 'yesterday', messages: [] },
-            { id: 5, title: 'تعلم JavaScript', date: 'lastweek', messages: [] },
-            { id: 6, title: 'مشروع Flutter', date: 'lastweek', messages: [] },
-            { id: 7, title: 'خطة تسويقية', date: 'lastweek', messages: [] },
-            { id: 8, title: 'ترجمة مقال', date: 'lastweek', messages: [] },
-        ];
-        let activeChatId = 0;
+        let sidebarOpen = false;
 
-        // Auto-resize textarea
+        // ===== SIDEBAR =====
+        function toggleSidebar() {
+            sidebarOpen = !sidebarOpen;
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            if (sidebarOpen) {
+                sidebar.classList.remove('hidden');
+                overlay.classList.add('show');
+            } else {
+                sidebar.classList.add('hidden');
+                overlay.classList.remove('show');
+            }
+        }
+
+        // ===== NEW CHAT =====
+        function newChat() {
+            document.getElementById('messages-container').innerHTML = '';
+            document.getElementById('messages-container').style.display = 'none';
+            document.getElementById('welcome-screen').style.display = 'flex';
+            document.getElementById('message-input').value = '';
+            document.getElementById('message-input').style.height = 'auto';
+            document.getElementById('send-btn').disabled = true;
+
+            document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+            toggleSidebar();
+        }
+
+        // ===== LOAD CHAT =====
+        function loadChat(index) {
+            document.querySelectorAll('.chat-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+            showToast('تم تحميل المحادثة');
+            if (window.innerWidth <= 768) toggleSidebar();
+        }
+
+        // ===== SEARCH CHATS =====
+        function searchChats(query) {
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.style.display = item.textContent.toLowerCase().includes(query.toLowerCase()) ? 'block' : 'none';
+            });
+        }
+
+        // ===== MODEL DROPDOWN =====
+        function toggleModelDropdown() {
+            document.getElementById('model-dropdown').classList.toggle('open');
+        }
+
+        function selectModel(model) {
+            currentModel = model;
+            document.getElementById('current-model').textContent = model;
+            document.getElementById('model-dropdown').classList.remove('open');
+
+            // Update checkmarks
+            document.querySelectorAll('.dropdown-item-check').forEach((check, i) => {
+                const models = ['Claude 4 Sonnet', 'Claude 4 Opus', 'Claude 4 Haiku'];
+                check.style.display = models[i] === model ? 'block' : 'none';
+            });
+
+            showToast('تم اختيار: ' + model);
+        }
+
+        // ===== PROFILE MENU =====
+        function toggleProfileMenu() {
+            showToast('قائمة الملف الشخصي');
+        }
+
+        // ===== SHARE =====
+        function shareChat() {
+            showToast('تم نسخ رابط المحادثة!');
+        }
+
+        // ===== ATTACHMENTS =====
+        function toggleAttachment() {
+            const attachments = document.getElementById('attachments');
+            attachments.classList.toggle('show');
+            if (attachments.classList.contains('show')) {
+                showToast('تم إرفاق الملف (Demo)');
+            }
+        }
+
+        function removeAttachment() {
+            document.getElementById('attachments').classList.remove('show');
+        }
+
+        // ===== WEB SEARCH =====
+        function toggleWebSearch() {
+            webSearchEnabled = !webSearchEnabled;
+            document.getElementById('web-search-btn').classList.toggle('active', webSearchEnabled);
+            showToast(webSearchEnabled ? 'البحث في الويب: مفعل' : 'البحث في الويب: معطل');
+        }
+
+        // ===== THINK MODE =====
+        function toggleThinkMode() {
+            thinkModeEnabled = !thinkModeEnabled;
+            document.getElementById('think-btn').classList.toggle('active', thinkModeEnabled);
+            showToast(thinkModeEnabled ? 'وضع التفكير العميق: مفعل' : 'وضع التفكير العميق: معطل');
+        }
+
+        // ===== AUTO RESIZE =====
         function autoResize(textarea) {
             textarea.style.height = 'auto';
             textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
-            const sendBtn = document.getElementById('send-btn');
-            sendBtn.disabled = textarea.value.trim().length === 0;
+            document.getElementById('send-btn').disabled = textarea.value.trim().length === 0;
         }
 
-        // Handle Enter key
+        // ===== HANDLE KEYDOWN =====
         function handleKeydown(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -424,7 +636,7 @@
             }
         }
 
-        // Send message
+        // ===== SEND MESSAGE =====
         function sendMessage() {
             const input = document.getElementById('message-input');
             const text = input.value.trim();
@@ -433,18 +645,18 @@
             const container = document.getElementById('messages-container');
             const welcome = document.getElementById('welcome-screen');
 
-            welcome.classList.add('hidden');
-            container.classList.remove('hidden');
+            welcome.style.display = 'none';
+            container.style.display = 'flex';
 
             // Add user message
             const userMsg = document.createElement('div');
-            userMsg.className = 'flex gap-4 justify-end animate-fade-in';
+            userMsg.className = 'message message-user animate-fade-in';
             userMsg.innerHTML = `
-                <div class="max-w-[80%]">
-                    <div class="user-bubble text-sm text-[#e8e8e8] leading-relaxed">${escapeHtml(text)}</div>
-                    <div class="text-[10px] text-[#555] mt-1 text-left">${getTime()}</div>
+                <div class="message-content">
+                    <div class="message-user-bubble">${escapeHtml(text)}</div>
+                    <div class="message-time">${getTime()}</div>
                 </div>
-                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-[#d97757] to-[#c45a3a] flex-shrink-0 flex items-center justify-center text-xs font-bold text-white">ر</div>
+                <div class="message-avatar message-avatar-user">ر</div>
             `;
             container.appendChild(userMsg);
 
@@ -453,7 +665,7 @@
             input.style.height = 'auto';
             document.getElementById('send-btn').disabled = true;
 
-            // Scroll to bottom
+            // Scroll
             const chatArea = document.getElementById('chat-area');
             chatArea.scrollTop = chatArea.scrollHeight;
 
@@ -462,13 +674,13 @@
                 const loadingId = 'loading-' + Date.now();
                 const loadingMsg = document.createElement('div');
                 loadingMsg.id = loadingId;
-                loadingMsg.className = 'flex gap-4 animate-fade-in';
+                loadingMsg.className = 'message animate-fade-in';
                 loadingMsg.innerHTML = `
-                    <div class="w-7 h-7 rounded-lg bg-[#d97757] flex-shrink-0 flex items-center justify-center">
+                    <div class="message-avatar message-avatar-ai">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                     </div>
-                    <div class="flex-1">
-                        <div class="loading-dots mt-2">
+                    <div class="message-ai-content">
+                        <div class="loading-dots" style="margin-top:8px">
                             <span></span><span></span><span></span>
                         </div>
                     </div>
@@ -476,7 +688,7 @@
                 container.appendChild(loadingMsg);
                 chatArea.scrollTop = chatArea.scrollHeight;
 
-                // Simulate AI response
+                // AI Response
                 setTimeout(() => {
                     loadingMsg.remove();
                     addAIResponse(container, chatArea);
@@ -484,36 +696,36 @@
             }, 300);
         }
 
-        // Add AI response
+        // ===== ADD AI RESPONSE =====
         function addAIResponse(container, chatArea) {
             const responses = [
-                `فهمت عليك! هذا رد تجريبي من واجهة Claude المقلدة.\n\nالموقع يدعم:\n• كتابة رسائل تفاعلية\n• عرض الأكواد البرمجية بتنسيق ملون\n• إدارة المحادثات السابقة\n• تصميم responsive\n\nجرب تكتب أي شيء تاني! 🚀`,
-                `ممتاز! أنا هنا لأساعدك في أي شيء تحتاجه. سواء كان برمجة، كتابة، تحليل، أو حتى مجرد محادثة عامة.\n\nما اللي تحتاج المساعدة فيه؟`,
-                `شكراً على رسالتك! 💡\n\nهذا الموقع تم بناؤه كـ demo تفاعلي يحاكي تجربة Claude AI. يمكنك:\n1. إرسال رسائل\n2. رؤية ردود بتأثير الكتابة الحية\n3. تصفح المحادثات السابقة\n4. إرفاق ملفات (demo)`,
-                `أهلاً وسهلاً! 👋\n\nأنا Claude (نسخة demo)، جاهز أساعدك في:\n- البرمجة والتطوير\n- الكتابة والتسويق\n- التحليل والبحث\n- التعلم والشرح\n\nشو بدك نشتغل عليه؟`,
-                `واضح! خليني أشرحلك بالتفصيل...\n\n**المميزات الرئيسية:**\n\n1. **واجهة سهلة**: تصميم بسيط وبديهي\n2. **سرعة الرد**: استجابة فورية\n3. **دعم اللغة العربية**: كامل الدعم\n4. **تنسيق Markdown**: عرض النصوص بشكل جميل\n\nتحتاج مساعدة في شيء محدد؟`
+                `فهمت عليك! هذا رد تجريبي من واجهة Claude المقلدة.<br><br>الموقع يدعم:<br>• كتابة رسائل تفاعلية<br>• عرض الأكواد البرمجية بتنسيق ملون<br>• إدارة المحادثات السابقة<br>• تصميم responsive<br><br>جرب تكتب أي شيء تاني! 🚀`,
+                `ممتاز! أنا هنا لأساعدك في أي شيء تحتاجه. سواء كان برمجة، كتابة، تحليل، أو حتى مجرد محادثة عامة.<br><br>ما اللي تحتاج المساعدة فيه؟`,
+                `شكراً على رسالتك! 💡<br><br>هذا الموقع تم بناؤه كـ demo تفاعلي يحاكي تجربة Claude AI. يمكنك:<br>1. إرسال رسائل<br>2. رؤية ردود بتأثير الكتابة الحية<br>3. تصفح المحادثات السابقة<br>4. إرفاق ملفات (demo)`,
+                `أهلاً وسهلاً! 👋<br><br>أنا Claude (نسخة demo)، جاهز أساعدك في:<br>- البرمجة والتطوير<br>- الكتابة والتسويق<br>- التحليل والبحث<br>- التعلم والشرح<br><br>شو بدك نشتغل عليه؟`,
+                `واضح! خليني أشرحلك بالتفصيل...<br><br><strong>المميزات الرئيسية:</strong><br><br>1. <strong>واجهة سهلة</strong>: تصميم بسيط وبديهي<br>2. <strong>سرعة الرد</strong>: استجابة فورية<br>3. <strong>دعم اللغة العربية</strong>: كامل الدعم<br>4. <strong>تنسيق Markdown</strong>: عرض النصوص بشكل جميل<br><br>تحتاج مساعدة في شيء محدد؟`
             ];
             const response = responses[Math.floor(Math.random() * responses.length)];
 
             const aiMsg = document.createElement('div');
-            aiMsg.className = 'flex gap-4 animate-fade-in';
+            aiMsg.className = 'message animate-fade-in';
             aiMsg.innerHTML = `
-                <div class="w-7 h-7 rounded-lg bg-[#d97757] flex-shrink-0 flex items-center justify-center">
+                <div class="message-avatar message-avatar-ai">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 </div>
-                <div class="flex-1">
-                    <div class="text-sm text-[#e8e8e8] leading-relaxed ai-content"></div>
-                    <div class="flex items-center gap-1 mt-2">
-                        <button onclick="copyMessage(this)" class="icon-btn" title="نسخ">
+                <div class="message-ai-content">
+                    <div class="message-ai-text ai-content"></div>
+                    <div class="message-actions">
+                        <button class="icon-btn" onclick="copyMessage(this)" title="نسخ">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                         </button>
-                        <button onclick="regenerateMessage(this)" class="icon-btn" title="إعادة إنشاء">
+                        <button class="icon-btn" onclick="regenerateMessage(this)" title="إعادة إنشاء">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
                         </button>
-                        <button onclick="likeMessage(this)" class="icon-btn" title="إعجاب">
+                        <button class="icon-btn" onclick="likeMessage(this)" title="إعجاب">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
                         </button>
-                        <button onclick="dislikeMessage(this)" class="icon-btn" title="عدم إعجاب">
+                        <button class="icon-btn" onclick="dislikeMessage(this)" title="عدم إعجاب">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3zm7-13h3a2 2 0 012 2v7a2 2 0 01-2 2h-3"/></svg>
                         </button>
                     </div>
@@ -525,199 +737,31 @@
             const contentDiv = aiMsg.querySelector('.ai-content');
 
             if (typingEnabled) {
-                typeText(contentDiv, response, () => {
-                    formatMessage(contentDiv);
-                });
+                typeText(contentDiv, response, () => {});
             } else {
-                contentDiv.innerHTML = formatMarkdown(response);
-                formatMessage(contentDiv);
+                contentDiv.innerHTML = response;
             }
         }
 
-        // Type text effect
-        function typeText(element, text, callback) {
-            let i = 0;
-            const speed = 12;
+        // ===== TYPE TEXT EFFECT =====
+        function typeText(element, html, callback) {
+            element.innerHTML = html;
+            if (callback) callback();
             const chatArea = document.getElementById('chat-area');
-
-            // Add cursor
-            const cursor = document.createElement('span');
-            cursor.className = 'typing-cursor';
-            cursor.textContent = '|';
-
-            function type() {
-                if (i < text.length) {
-                    const char = text.charAt(i);
-                    if (char === '\' && text.charAt(i + 1) === 'n') {
-                        element.appendChild(document.createElement('br'));
-                        i += 2;
-                    } else {
-                        element.appendChild(document.createTextNode(char));
-                        i++;
-                    }
-                    element.appendChild(cursor);
-                    chatArea.scrollTop = chatArea.scrollHeight;
-                    setTimeout(type, speed);
-                } else {
-                    cursor.remove();
-                    if (callback) callback();
-                }
-            }
-            type();
+            chatArea.scrollTop = chatArea.scrollHeight;
         }
 
-        // Format message after typing
-        function formatMessage(element) {
-            const html = element.innerHTML;
-            element.innerHTML = formatMarkdown(html);
-        }
-
-        // Simple markdown formatter
-        function formatMarkdown(text) {
-            let html = escapeHtml(text);
-
-            // Bold
-            html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>');
-            // Italic
-            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            // Code inline
-            html = html.replace(/`([^`]+)`/g, '<code class="bg-[#2a2a2a] px-1.5 py-0.5 rounded text-[#d97757] text-xs font-mono">$1</code>');
-            // Links
-            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-[#d97757] hover:underline" target="_blank">$1</a>');
-            // Line breaks
-            html = html.replace(/\n/g, '<br>');
-
-            return html;
-        }
-
-        // Quick send from welcome cards
+        // ===== QUICK SEND =====
         function sendQuick(text) {
             document.getElementById('message-input').value = text;
             autoResize(document.getElementById('message-input'));
             sendMessage();
         }
 
-        // Toggle sidebar
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('sidebar-hidden');
-        }
-
-        // New chat
-        function newChat() {
-            document.getElementById('messages-container').innerHTML = '';
-            document.getElementById('messages-container').classList.add('hidden');
-            document.getElementById('welcome-screen').classList.remove('hidden');
-            document.getElementById('message-input').value = '';
-            document.getElementById('message-input').style.height = 'auto';
-            document.getElementById('send-btn').disabled = true;
-
-            document.querySelectorAll('.chat-item').forEach(item => {
-                item.classList.remove('active');
-            });
-        }
-
-        // Load chat
-        function loadChat(index) {
-            document.querySelectorAll('.chat-item').forEach((item, i) => {
-                item.classList.toggle('active', i === index);
-            });
-            activeChatId = index;
-            showToast('تم تحميل المحادثة: ' + chats[index].title);
-        }
-
-        // Search chats
-        function searchChats(query) {
-            const items = document.querySelectorAll('.chat-item');
-            items.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                item.style.display = text.includes(query.toLowerCase()) ? 'block' : 'none';
-            });
-        }
-
-        // Toggle attachment
-        function toggleAttachment() {
-            const attachments = document.getElementById('attachments');
-            attachments.classList.toggle('hidden');
-            if (!attachments.classList.contains('hidden')) {
-                showToast('تم إرفاق الملف (Demo)');
-            }
-        }
-
-        function removeAttachment() {
-            document.getElementById('attachments').classList.add('hidden');
-        }
-
-        // Toggle web search
-        function toggleWebSearch() {
-            webSearchEnabled = !webSearchEnabled;
-            const btn = document.getElementById('web-search-btn');
-            btn.classList.toggle('text-[#d97757]', webSearchEnabled);
-            showToast(webSearchEnabled ? 'البحث في الويب: مفعل' : 'البحث في الويب: معطل');
-        }
-
-        // Toggle think mode
-        function toggleThinkMode() {
-            thinkModeEnabled = !thinkModeEnabled;
-            const btn = document.getElementById('think-btn');
-            btn.classList.toggle('text-[#d97757]', thinkModeEnabled);
-            showToast(thinkModeEnabled ? 'وضع التفكير العميق: مفعل' : 'وضع التفكير العميق: معطل');
-        }
-
-        // Model dropdown
-        function toggleModelDropdown() {
-            document.getElementById('model-dropdown').classList.toggle('open');
-        }
-
-        function selectModel(model) {
-            currentModel = model;
-            document.getElementById('current-model').textContent = model;
-            document.getElementById('model-dropdown').classList.remove('open');
-            showToast('تم اختيار: ' + model);
-        }
-
-        // Profile menu
-        function toggleProfileMenu() {
-            const menu = document.getElementById('profile-menu');
-            menu.style.opacity = menu.style.opacity === '1' ? '0' : '1';
-            menu.style.visibility = menu.style.visibility === 'visible' ? 'hidden' : 'visible';
-            menu.style.transform = menu.style.transform === 'translateY(0px)' ? 'translateY(-10px)' : 'translateY(0px)';
-        }
-
-        // Settings modal
-        function toggleSettings() {
-            const modal = document.getElementById('settings-modal');
-            modal.classList.toggle('hidden');
-            modal.classList.toggle('flex');
-        }
-
-        function toggleDarkMode(btn) {
-            btn.classList.toggle('bg-[#333]');
-            btn.classList.toggle('bg-[#d97757]');
-            const span = btn.querySelector('span');
-            span.style.transform = span.style.transform === 'translateX(-24px)' ? 'translateX(0)' : 'translateX(-24px)';
-        }
-
-        function toggleTypingEffect(btn) {
-            typingEnabled = !typingEnabled;
-            btn.classList.toggle('bg-[#333]');
-            btn.classList.toggle('bg-[#d97757]');
-            const span = btn.querySelector('span');
-            span.style.transform = span.style.transform === 'translateX(-24px)' ? 'translateX(0)' : 'translateX(-24px)';
-            showToast(typingEnabled ? 'تأثير الكتابة: مفعل' : 'تأثير الكتابة: معطل');
-        }
-
-        // Share chat
-        function shareChat() {
-            showToast('تم نسخ رابط المحادثة!');
-        }
-
-        // Message actions
+        // ===== MESSAGE ACTIONS =====
         function copyMessage(btn) {
-            const content = btn.closest('.flex-1').querySelector('.ai-content').textContent;
-            navigator.clipboard.writeText(content).then(() => {
-                showToast('تم النسخ!');
-            });
+            const content = btn.closest('.message-ai-content').querySelector('.ai-content').textContent;
+            navigator.clipboard.writeText(content).then(() => showToast('تم النسخ!'));
         }
 
         function regenerateMessage(btn) {
@@ -728,16 +772,16 @@
         }
 
         function likeMessage(btn) {
-            btn.classList.toggle('text-[#d97757]');
+            btn.style.color = '#d97757';
             showToast('شكراً على تقييمك! 👍');
         }
 
         function dislikeMessage(btn) {
-            btn.classList.toggle('text-red-400');
+            btn.style.color = '#ef4444';
             showToast('سنحسن من الردود مستقبلاً');
         }
 
-        // Toast
+        // ===== TOAST =====
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -745,7 +789,7 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // Helpers
+        // ===== HELPERS =====
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
@@ -757,34 +801,23 @@
             return now.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
         }
 
-        // Close dropdowns on click outside
+        // ===== CLOSE DROPDOWNS ON CLICK OUTSIDE =====
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#model-dropdown')) {
                 document.getElementById('model-dropdown').classList.remove('open');
             }
-            if (!e.target.closest('#profile-menu') && !e.target.closest('button[onclick="toggleProfileMenu()"]')) {
-                const menu = document.getElementById('profile-menu');
-                menu.style.opacity = '0';
-                menu.style.visibility = 'hidden';
-                menu.style.transform = 'translateY(-10px)';
+        });
+
+        // ===== KEYBOARD SHORTCUTS =====
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('model-dropdown').classList.remove('open');
+                if (sidebarOpen) toggleSidebar();
             }
         });
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                document.getElementById('settings-modal').classList.add('hidden');
-                document.getElementById('settings-modal').classList.remove('flex');
-            }
-            if (e.ctrlKey && e.key === 'k') {
-                e.preventDefault();
-                document.getElementById('search-input').focus();
-            }
-            if (e.ctrlKey && e.key === 'n') {
-                e.preventDefault();
-                newChat();
-            }
-        });
+        // ===== INIT =====
+        console.log('Claude AI Chat loaded successfully!');
     </script>
 </body>
 </html>
