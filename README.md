@@ -10,14 +10,17 @@
 4. من github.com/settings/developers: اعمل OAuth App جديد:
    - Homepage URL: رابط موقعك على Vercel
    - Authorization callback URL: `https://your-domain.vercel.app/api/auth/callback/github`
-5. في Vercel، أضف متغيرات البيئة دي (خدها من `.env.example`):
+5. من console.cloud.google.com > APIs & Services > Credentials: اعمل OAuth Client ID جديد (نوع Web application):
+   - Authorized redirect URI: `https://your-domain.vercel.app/api/auth/callback/google`
+6. في Vercel، أضف متغيرات البيئة دي (خدها من `.env.example`):
    - `DATABASE_URL`
    - `AUTH_SECRET` (نفّذ `openssl rand -base64 33` أو أي مولّد أونلاين)
    - `AUTH_URL` (رابط موقعك)
    - `AUTH_GITHUB_ID` / `AUTH_GITHUB_SECRET`
+   - `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET`
    - `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY`
    - `HUMAN_CHECK_SECRET` (أي نص عشوائي طويل تاني)
-6. بعد أول Deploy، شغّل مرة واحدة: `npx prisma db push` (من جهازك أو من Vercel CLI) عشان ينشئ الجداول في قاعدة البيانات.
+7. بعد أول Deploy، شغّل مرة واحدة: `npx prisma db push` (من جهازك أو من Vercel CLI) عشان ينشئ الجداول في قاعدة البيانات.
 
 ## اللي جاي في المرحلة الجاية
 
