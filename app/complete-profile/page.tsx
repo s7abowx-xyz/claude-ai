@@ -17,6 +17,10 @@ export default function CompleteProfilePage() {
     router.replace("/login");
     return null;
   }
+  if ((session?.user as any)?.username) {
+    router.replace("/");
+    return null;
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
