@@ -25,7 +25,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: "فشل التحقق" }, { status: 403 });
   }
 
-  const humanToken = await createHumanToken();
+  const humanToken = await createHumanToken().catch(() => null);
+  if (!humanToken) {
+    return NextResponse.json(
+      { success: false, error: "الإعدادات ناقصة على السيرفر (HUMAN_CHECK_SECRET)" },
+      { status: 500 }
+    );
+  }
   const res = NextResponse.json({ success: true });
   res.cookies.set(HUMAN_COOKIE_NAME, humanToken, {
     httpOnly: true,
