@@ -3,10 +3,19 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { cardStyle, inputStyle, primaryButtonStyle, ghostButtonStyle } from "../_components/authUi";
+import {
+  cardStyle,
+  logoWrapStyle,
+  inputStyle,
+  primaryButtonStyle,
+  ghostButtonStyle,
+  providerRowStyle,
+  dividerRowStyle,
+} from "../_components/authUi";
 
 export default function SignupPage() {
   const [form, setForm] = useState({ name: "", username: "", email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +42,7 @@ export default function SignupPage() {
     }
 
     const signInRes = await signIn("credentials", {
-      email: form.email,
+      identifier: form.email,
       password: form.password,
       redirect: false,
     });
@@ -56,29 +65,30 @@ export default function SignupPage() {
       }}
     >
       <div style={cardStyle}>
-        <h1 style={{ fontSize: 22, margin: "0 0 4px" }}>إنشاء حساب</h1>
-        <p style={{ color: "var(--text-muted)", fontSize: 13, margin: "0 0 22px" }}>
+        <div style={logoWrapStyle}>SH</div>
+        <h1 style={{ fontSize: 20, margin: "0 0 4px", textAlign: "center" }}>إنشاء حساب</h1>
+        <p style={{ color: "var(--text-muted)", fontSize: 13, margin: "0 0 22px", textAlign: "center" }}>
           انضم لمجتمع مطوري بوتات الواتساب
         </p>
 
-        <button
-          type="button"
-          style={{ ...ghostButtonStyle, marginBottom: 16 }}
-          onClick={() => signIn("github", { callbackUrl: "/complete-profile" })}
-        >
-          التسجيل عبر GitHub
-        </button>
+        <div style={providerRowStyle}>
+          <button
+            type="button"
+            style={ghostButtonStyle}
+            onClick={() => signIn("google", { callbackUrl: "/complete-profile" })}
+          >
+            جوجل
+          </button>
+          <button
+            type="button"
+            style={ghostButtonStyle}
+            onClick={() => signIn("github", { callbackUrl: "/complete-profile" })}
+          >
+            جيت هاب
+          </button>
+        </div>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            color: "var(--text-muted)",
-            fontSize: 12,
-            margin: "16px 0",
-          }}
-        >
+        <div style={dividerRowStyle}>
           <span style={{ flex: 1, height: 1, background: "var(--border)" }} />
           أو
           <span style={{ flex: 1, height: 1, background: "var(--border)" }} />
@@ -107,14 +117,34 @@ export default function SignupPage() {
             onChange={(e) => update("email", e.target.value)}
             required
           />
-          <input
-            style={inputStyle}
-            type="password"
-            placeholder="كلمة المرور (8 حروف فأكثر)"
-            value={form.password}
-            onChange={(e) => update("password", e.target.value)}
-            required
-          />
+          <div style={{ position: "relative" }}>
+            <input
+              style={{ ...inputStyle, paddingLeft: 40 }}
+              type={showPassword ? "text" : "password"}
+              placeholder="كلمة المرور (8 حروف فأكثر)"
+              value={form.password}
+              onChange={(e) => update("password", e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((s) => !s)}
+              style={{
+                position: "absolute",
+                left: 10,
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                color: "var(--text-muted)",
+                cursor: "pointer",
+                padding: 0,
+                fontSize: 12,
+              }}
+            >
+              {showPassword ? "إخفاء" : "إظهار"}
+            </button>
+          </div>
           {error && <p style={{ color: "var(--danger)", fontSize: 13, margin: 0 }}>{error}</p>}
           <button type="submit" style={primaryButtonStyle} disabled={loading}>
             {loading ? "جاري الإنشاء..." : "إنشاء الحساب"}
