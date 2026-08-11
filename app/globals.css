@@ -1,0 +1,68 @@
+:root {
+  --bg: #060f11;
+  --surface: #0b1e21;
+  --surface-alt: #0f2a2d;
+  --border: #123338;
+  --accent: #00f5c8;
+  --accent-cyan: #38f0ff;
+  --text: #e8fffb;
+  --text-muted: #7fa8a3;
+  --danger: #ff5c7a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+body {
+  background-image: radial-gradient(circle at 20% -10%, rgba(0, 245, 200, 0.08), transparent 40%),
+    radial-gradient(circle at 80% 110%, rgba(56, 240, 255, 0.06), transparent 45%);
+  background-attachment: fixed;
+  min-height: 100dvh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), sans-serif;
+  letter-spacing: -0.01em;
+}
+
+code,
+.mono {
+  font-family: var(--font-mono), monospace;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: var(--accent);
+  color: #041412;
+}
+
+/* شريط تمرير رفيع بلون التيمة */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--surface-alt);
+  border-radius: 4px;
+}
