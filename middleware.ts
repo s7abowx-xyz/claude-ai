@@ -16,7 +16,14 @@ export async function middleware(req: NextRequest) {
   if (isPublic) return NextResponse.next();
 
   const token = req.cookies.get(HUMAN_COOKIE_NAME)?.value;
-  const valid = await isValidHumanToken(token);
+
+  let valid = false;
+  try {
+    valid = await isValidHumanToken(token);
+  } catch {
+    // HUMAN_CHECK_SECRET غير معرّف - نعتبره غير متحقق بدل ما نطيح الموقع كله
+    valid = false;
+  }
 
   if (!valid) {
     const url = req.nextUrl.clone();
