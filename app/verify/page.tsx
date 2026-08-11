@@ -32,7 +32,7 @@ function VerifyInner() {
   const params = useSearchParams();
   const [lines, setLines] = useState<string[]>([]);
   const [showWidget, setShowWidget] = useState(false);
-  const [status, setStatus] = useState<"idle" | "checking" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "checking" | "error" | "misconfigured">("idle");
   const widgetRef = useRef<HTMLDivElement>(null);
   const rendered = useRef(false);
 
@@ -51,15 +51,26 @@ function VerifyInner() {
 
   useEffect(() => {
     if (!showWidget || rendered.current) return;
+
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    if (!siteKey) {
+      setStatus("misconfigured");
+      return;
+    }
+
     const tryRender = () => {
       if (window.turnstile && widgetRef.current) {
         rendered.current = true;
-        window.turnstile.render(widgetRef.current, {
-          sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
-          theme: "dark",
-          callback: onSuccess,
-          "error-callback": () => setStatus("error"),
-        });
+        try {
+          window.turnstile.render(widgetRef.current, {
+            sitekey: siteKey,
+            theme: "dark",
+            callback: onSuccess,
+            "error-callback": () => setStatus("error"),
+          });
+        } catch {
+          setStatus("misconfigured");
+        }
       } else {
         setTimeout(tryRender, 200);
       }
@@ -143,6 +154,14 @@ function VerifyInner() {
               {status === "error" && (
                 <p style={{ color: "var(--danger)", marginTop: 8 }}>
                   &gt; فشل التحقق، حدّث الصفحة وحاول تاني.
+                </p>
+              )}
+              {status === "misconfigured" && (
+                <p style={{ color: "var(--danger)", marginTop: 8, lineHeight: 1.6 }}>
+                  &gt; إعدادات التحقق ناقصة على السيرفر.
+                  <br />
+                  تأكد إن NEXT_PUBLIC_TURNSTILE_SITE_KEY و TURNSTILE_SECRET_KEY مضافين في Vercel
+                  Environment Variables، وإنك عملت Redeploy بعد إضافتهم.
                 </p>
               )}
             </div>
