@@ -26,7 +26,7 @@ export default async function Home() {
           <p style={{ color: "var(--text-muted)" }}>
             أهلاً {session.user.name} — الجاي: واجهة الشات وصفحات البروفايل
           </p>
-          {!("username" in session.user && session.user.username) && (
+          {!(session.user as any)?.username && (
             <Link href="/complete-profile" style={{ color: "var(--accent)" }}>
               كمّل بياناتك (اختار يوزرنيم)
             </Link>
